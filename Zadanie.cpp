@@ -99,14 +99,34 @@ int main()
     vector<Card> dealerHand;
 
     // Раздача карт игроку и дилеру
-    playerHand.push_back(deck.back());
+    /*playerHand.push_back(deck.back());
     deck.pop_back();
     dealerHand.push_back(deck.back());
     deck.pop_back();
     playerHand.push_back(deck.back());
     deck.pop_back();
     dealerHand.push_back(deck.back());
-    deck.pop_back();
+    deck.pop_back();*/
+
+    if (!deck.empty()) {
+        playerHand.push_back(deck.back());
+        deck.pop_back();
+    }
+
+    if (!deck.empty()) {
+        dealerHand.push_back(deck.back());
+        deck.pop_back();
+    }
+
+    if (!deck.empty()) {
+        playerHand.push_back(deck.back());
+        deck.pop_back();
+    }
+
+    if (!deck.empty()) {
+        dealerHand.push_back(deck.back());
+        deck.pop_back();
+    }
 
     // Вывод карт игрока
     cout << "Ваши карты: " << endl;
@@ -125,10 +145,10 @@ int main()
     while (!playerBust && !playerStand) {
         if (!playerStand) {
             string choice;
-            cout << "Хотите взять еще карту? (Да/Нет): ";
+            cout << "Хотите взять еще карту? (y - да, n - нет): ";
             cin >> choice;
 
-            if (choice == "Да") {
+            if (choice == "y") {
                 playerHand.push_back(deck.back());
                 deck.pop_back();
 
@@ -140,7 +160,7 @@ int main()
                 cout << "Очки: " << points << endl;
 
                 if (points > 21) {
-                    cout << "Вы проиграли! Перебор!\n" << endl;
+                    cout << "Вы проиграли! Перебор!" << endl;
                     playerBust = true;
                 }
             }
@@ -152,10 +172,43 @@ int main()
 
 
     if (!playerBust) {
-        // Открываем вторую карту дилера
+
+        int totalPoints = 0;
+        for (Card card : dealerHand) {
+            if (card.value == 1) {
+                if (totalPoints + 11 <= 21) {
+                    totalPoints += 11; // Если возможно, туз считается как 11
+                }
+                else {
+                    totalPoints += 1; // Иначе, считаем туз как 1
+                }
+            }
+            else {
+                totalPoints += card.value; // Добавляем значение карты к общей сумме
+            }
+        }
+
+        // Если перебор, пересчитываем тузы
+        if (totalPoints > 21) {
+            for (Card card : dealerHand) {
+                if (card.value == 1) {
+                    totalPoints -= 10; // Уменьшаем значение туза до 1, если обнаружен перебор
+                    if (totalPoints <= 21) {
+                        break; // Если после уменьшения значение стало не больше 21, прекращаем пересчет
+                    }
+                }
+            }
+        }
+
+        // Вывод количества очков дилера
         cout << "Дилер открывает вторую карту: " << endl;
         displayCard(dealerHand[1]);
         cout << "Очки дилера: " << calculatePoints(dealerHand) << endl;
+
+        // Открываем вторую карту дилера
+        //cout << "Дилер открывает вторую карту: " << endl;
+        //displayCard(dealerHand[1]);
+        //cout << "Очки дилера: " << calculatePoints(dealerHand) << endl;
 
         // Игровой цикл для дилера
         while (calculatePoints(dealerHand) < 17) {
@@ -169,7 +222,7 @@ int main()
         // Определение победителя
         cout << "Итоговые очки:" << endl;
         cout << "Ваши очки: " << playerPoints << endl;
-        cout << "Очки дилера: " << dealerPoints << endl;
+        cout << "Очки дилера: " << calculatePoints(dealerHand) << endl;
 
         if (playerPoints > 21) {
             cout << "Вы проиграли, перебор!" << endl;
@@ -188,4 +241,5 @@ int main()
 
     return 0;
 }
+
 
